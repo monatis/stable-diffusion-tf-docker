@@ -1,0 +1,30 @@
+version: "3.3"
+
+services:
+  app:
+    image: myusufs/stable-diffusion-tf
+    build:
+      context: .
+    environment:
+      # configure env vars to your liking
+      - HEIGHT=512
+      - WIDTH=512
+      - MIXED_PRECISION=no
+    ports:
+      - "${PUBLIC_PORT?Public port not set as an environment variable}:8000"
+    volumes:
+      - ./data:/app/data
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1442
