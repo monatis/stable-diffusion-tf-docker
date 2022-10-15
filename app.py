@@ -7,7 +7,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse
 from PIL import Image
 from pydantic import BaseModel, Field
-from stable_diffusion_tf.stable_diffusion import Text2Image
+from stable_diffusion_tf.stable_diffusion import StableDiffusion
 from tensorflow import keras
 
 height = int(os.environ.get("WIDTH", 512))
@@ -17,7 +17,7 @@ mixed_precision = os.environ.get("MIXED_PRECISION", "no") == "yes"
 if mixed_precision:
     keras.mixed_precision.set_global_policy("mixed_float16")
 
-generator = Text2Image(img_height=height, img_width=width, jit_compile=False)
+generator = StableDiffusion(img_height=height, img_width=width, jit_compile=False)
 
 app = FastAPI(title="Stable Diffusion API")
 
