@@ -1,8 +1,9 @@
 import os
 import time
 import uuid
+from io import BytesIO
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse
 from PIL import Image
@@ -56,3 +57,16 @@ async def download(id: str):
         return FileResponse(path, media_type="image/png", filename=path.split(os.path.sep)[-1])
     else:
         raise HTTPException(404, detail="No such file")
+
+@app.post("/upload", response_model=GenerationResult)
+async def upload(file: bytes = File()):
+    start = time.time()
+    id = str(uuid.uuid4())
+    path = os.path.join("/app/data", f"{id}.png")
+    try:
+        img = Image.open(stream = BytesIO(file))
+        img.save(path)
+        alapsed = time.time() - start
+        return GenerationResult(download_id=id, t=alapsed)
+    except:
+        raise HTTPException(400, detail="Unable to read as an image")
